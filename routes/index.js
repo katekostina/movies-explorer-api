@@ -6,6 +6,7 @@ const usersRouter = require('./users');
 const auth = require('../middlewares/auth');
 const { signUp, signIn } = require('../controllers/users');
 const { validateSignInInfo, validateProfileInfo } = require('../middlewares/validations');
+const errorMessages = require('../errors/messages');
 
 // open routes for not-authorized users
 router.post('/signin', validateSignInInfo, signIn);
@@ -19,7 +20,7 @@ router.use('/users', usersRouter);
 router.use('/movies', moviesRouter);
 
 router.use((req, res, next) => {
-  next(new NotFoundError('Такая страница не найдена.'));
+  next(new NotFoundError(errorMessages.notFoundRoute));
 });
 
 module.exports = router;

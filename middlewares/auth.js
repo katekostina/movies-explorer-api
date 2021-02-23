@@ -2,22 +2,23 @@ require('dotenv').config();
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 const jwt = require('jsonwebtoken');
+const { devJwtSecret } = require('../config');
 const UnauthorizedError = require('../errors/unauthorized-error');
+const errorMessages = require('../errors/messages');
 
-// eslint-disable-next-line consistent-return
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    throw new UnauthorizedError('Необходима авторизация');
+    throw new UnauthorizedError(errorMessages.unauthorized);
   }
 
   const token = authorization.replace('Bearer ', '');
   let payload;
   try {
-    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : devJwtSecret);
   } catch (err) {
-    throw new UnauthorizedError('Необходима авторизация');
+    throw new UnauthorizedError(errorMessages.unauthorized);
   }
 
   req.user = payload;

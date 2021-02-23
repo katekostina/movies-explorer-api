@@ -3,9 +3,11 @@ require('dotenv').config();
 const { NODE_ENV, JWT_SECRET } = process.env;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { devJwtSecret } = require('../config');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
+const errorMessages = require('../errors/messages');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -19,7 +21,7 @@ const getProfile = (req, res, next) => {
       if (user) {
         res.status(200).send({ data: user });
       } else {
-        throw new NotFoundError('Пользователь не найден.');
+        throw new NotFoundError(errorMessages.notFoundUser);
       }
     })
     .catch(next);
@@ -42,7 +44,7 @@ const updateProfile = (req, res, next) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Произошла ошибка валидации данных пользователя.'));
+        next(new BadRequestError(errorMessages.badRequestUser));
       } else {
         next(err);
       }
@@ -54,7 +56,7 @@ const signUp = (req, res, next) => {
   const trimmedPassword = String(password).trim();
   const trimmedEmail = String(email).trim();
   if (trimmedPassword.length < 8) {
-    throw new BadRequestError('Пароль должен содержать не менее восьми символов.');
+    throw new BadRequestError(errorMessages.badPassword);
   }
   bcrypt
     .hash(trimmedPassword, 10)
@@ -68,9 +70,9 @@ const signUp = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Произошла ошибка валидации данных нового пользователя.'));
+        next(new BadRequestError(errorMessages.badNewUser));
       } else if (err.name === 'MongoError' && err.code === 11000) {
-        next(new BadRequestError('Такой пользователь уже есть.'));
+        next(new BadRequestError(errorMessages.duplicateUser));
       } else {
         console.error(err);
         next(err);
@@ -84,7 +86,7 @@ const signIn = (req, res, next) => {
   const trimmedEmail = String(email).trim();
   User.findUserByCredentials(trimmedEmail, trimmedPassword)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : devJwtSecret, { expiresIn: '7d' });
       res.send({ token });
     })
     .catch(next);
