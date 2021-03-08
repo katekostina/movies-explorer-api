@@ -18,13 +18,13 @@ mongoose.connect(MONGO_URL, {
   useFindAndModify: false,
 });
 
+app.use(requestLogger);
 app.use(limiter);
 app.use(helmet());
 app.use(express.json());
 app.use(cors());
 app.use(express.static(__dirname));
 
-app.use(requestLogger);
 app.use(routes);
 
 app.use(errorLogger);

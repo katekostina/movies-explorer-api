@@ -5,12 +5,12 @@ const moviesRouter = require('./movies');
 const usersRouter = require('./users');
 const auth = require('../middlewares/auth');
 const { signUp, signIn } = require('../controllers/users');
-const { validateSignInInfo, validateProfileInfo } = require('../middlewares/validations');
+const { validateSignInInfo, validateSignUpInfo } = require('../middlewares/validations');
 const errorMessages = require('../errors/messages');
 
 // open routes for not-authorized users
 router.post('/signin', validateSignInInfo, signIn);
-router.post('/signup', validateProfileInfo, signUp);
+router.post('/signup', validateSignUpInfo, signUp);
 
 // check if user authorized
 router.use(auth);

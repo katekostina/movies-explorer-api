@@ -28,10 +28,10 @@ const getProfile = (req, res, next) => {
 };
 
 const updateProfile = (req, res, next) => {
-  const { email, password, name } = req.body;
+  const { email, name } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
-    { email, password, name },
+    { email, name },
     {
       // передать обновлённый объект на вход обработчику then
       new: true,
@@ -41,7 +41,13 @@ const updateProfile = (req, res, next) => {
       upsert: false,
     },
   )
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => {
+      if (user) {
+        res.status(200).send({ data: user });
+      } else {
+        throw new NotFoundError(errorMessages.notFoundUser);
+      }
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError(errorMessages.badRequestUser));
@@ -74,7 +80,6 @@ const signUp = (req, res, next) => {
       } else if (err.name === 'MongoError' && err.code === 11000) {
         next(new BadRequestError(errorMessages.duplicateUser));
       } else {
-        console.error(err);
         next(err);
       }
     });
@@ -86,12 +91,20 @@ const signIn = (req, res, next) => {
   const trimmedEmail = String(email).trim();
   User.findUserByCredentials(trimmedEmail, trimmedPassword)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : devJwtSecret, { expiresIn: '7d' });
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : devJwtSecret,
+        { expiresIn: '7d' },
+      );
       res.send({ token });
     })
     .catch(next);
 };
 
 module.exports = {
-  getUsers, getProfile, updateProfile, signUp, signIn,
+  getUsers,
+  getProfile,
+  updateProfile,
+  signUp,
+  signIn,
 };
