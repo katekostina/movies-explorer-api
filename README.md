@@ -2,6 +2,6 @@
 Репозиторий бекенда дипломного проекта.
   
 # Домен
-api.katekostinadiploma.students.nomoredomains.monster
+api.diploma.katekostina.students.nomoredomains.monster
 
-### Публичный Ipv4 130.193.44.141
+### Публичный Ipv4 178.154.210.108
