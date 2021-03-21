@@ -7,9 +7,8 @@ const limiter = require('./middlewares/limiter');
 const routes = require('./routes');
 const serverErrorHandler = require('./middlewares/serverErrorHandler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { devPort, devMongoUrl } = require('./config');
 
-const { PORT = devPort, MONGO_URL = devMongoUrl } = process.env;
+const { PORT, MONGO_URL } = process.env;
 
 const app = express();
 mongoose.connect(MONGO_URL, {
@@ -19,10 +18,13 @@ mongoose.connect(MONGO_URL, {
 });
 
 app.use(requestLogger);
+app.use(cors({
+  origin: '*',
+  credentials: true,
+}));
 app.use(limiter);
 app.use(helmet());
 app.use(express.json());
-app.use(cors());
 app.use(express.static(__dirname));
 
 app.use(routes);

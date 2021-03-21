@@ -42,17 +42,17 @@ const validatePatchProfileInfo = celebrate({
 
 const validateMovieInfo = celebrate({
   body: Joi.object().keys({
-    country: Joi.string().required().min(2).max(50),
-    director: Joi.string().required().min(2).max(50),
-    duration: Joi.number().required().min(1).max(10000),
-    year: Joi.string().required().min(1).max(10),
-    description: Joi.string().required().min(1).max(10000),
-    image: Joi.string().required().uri().custom(validateURL),
-    trailer: Joi.string().required().uri().custom(validateURL),
-    thumbnail: Joi.string().required().uri().custom(validateURL),
-    movieId: Joi.string().required().min(1).max(50),
-    nameRU: Joi.string().required().min(1).max(50),
-    nameEN: Joi.string().required().min(1).max(50),
+    country: Joi.string().required(),
+    director: Joi.string().required(),
+    duration: Joi.number().required(),
+    year: Joi.string().required(),
+    description: Joi.string().required(),
+    image: Joi.string().required().custom(validateURL),
+    trailer: Joi.string().required().custom(validateURL),
+    thumbnail: Joi.string().required().custom(validateURL),
+    movieId: Joi.number().required(),
+    nameRU: Joi.string().required(),
+    nameEN: Joi.string().required(),
   }),
 });
 

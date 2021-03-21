@@ -61,7 +61,7 @@ const deleteMovie = (req, res, next) => {
       if (me.toString() !== movie.owner.toString()) {
         throw new ForbiddenError(errorMessages.notMyMovie);
       }
-      Movie.remove(movie)
+      Movie.deleteOne({ _id: movie._id })
         .then((deleteInfo) => {
           res.status(200).send({ deleteInfo });
         })
